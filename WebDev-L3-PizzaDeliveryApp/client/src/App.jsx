@@ -1,30 +1,16 @@
-import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
 
-function App() {
-  const [message, setMessage] = useState("Loading...");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadMessage = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/`);
-        const text = await res.text;
-        setMessage(text);
-      } catch {
-        setMessage("Server not connected");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadMessage();
-  }, []);
-
+const App = () => {
   return (
     <div>
-      <h1>Pizza Dot</h1>
-      <p>{loading ? "Loading..." : message}</p>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
     </div>
   );
-}
+};
 
 export default App;
