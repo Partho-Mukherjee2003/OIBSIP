@@ -3,6 +3,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
+import pizzaRoutes from "./routes/pizza.js";
+
+
 
 dotenv.config();
 
@@ -15,6 +18,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api", pizzaRoutes);
+
 
 mongoose
   .connect(process.env.MONGODB_URI)
