@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const statusColor = {
   "Order Received": "bg-yellow-100 text-yellow-700",
   "In Kitchen": "bg-blue-100 text-blue-700",
   "Sent to Delivery": "bg-green-100 text-green-700",
+  Cancelled: "bg-red-100 text-red-700",
 };
 
 const steps = ["Order Received", "In Kitchen", "Sent to Delivery"];
@@ -13,6 +15,7 @@ const statusNote = {
   "Order Received": "We've got your order and will start on it shortly.",
   "In Kitchen": "Your pizza is being made right now.",
   "Sent to Delivery": "It's on its way to you. Enjoy!",
+  Cancelled: "This order was cancelled. Please contact us if you need help.",
 };
 
 /* ---------- Animations (plain CSS, no extra packages) ---------- */
@@ -21,18 +24,16 @@ const styles = `
 @keyframes moPop { 0% { opacity: 0; transform: scale(.7); } 70% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes moGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes moBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
-@keyframes moShimmer { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
 
 .mo-reveal { opacity: 0; }
 .mo-reveal.mo-in { animation: moFadeUp .6s cubic-bezier(.2,.7,.2,1) both; }
 .mo-pop { animation: moPop .4s ease both; }
 .mo-grow { transform-origin: left; animation: moGrow .9s cubic-bezier(.2,.7,.2,1) .2s both; }
 .mo-blink { animation: moBlink 1.6s ease-in-out infinite; }
-.mo-skel { background: #FFF9ED; animation: moShimmer 1.3s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .mo-reveal { opacity: 1; }
-  .mo-reveal.mo-in, .mo-pop, .mo-grow, .mo-blink, .mo-skel { animation: none; }
+  .mo-reveal.mo-in, .mo-pop, .mo-grow, .mo-blink { animation: none; }
 }
 `;
 
@@ -118,6 +119,7 @@ const Timeline = ({ status }) => {
 const OrderCard = ({ order, index }) => {
   const names = order.items.map((i) => i.name);
   const paid = String(order.paymentStatus).toLowerCase() === "paid";
+  const cancelled = order.status === "Cancelled";
 
   return (
     <Reveal delay={Math.min(index, 5) * 80}>
@@ -147,7 +149,7 @@ const OrderCard = ({ order, index }) => {
           {statusNote[order.status] || "We're working on your order."}
         </p>
 
-        <Timeline status={order.status} />
+        {!cancelled && <Timeline status={order.status} />}
 
         {/* items */}
         <div className="mt-6 border-t border-[#F5E6CC] pt-5">
@@ -204,10 +206,6 @@ const OrderCard = ({ order, index }) => {
   );
 };
 
-const SkeletonCard = () => (
-  <div className="mo-skel h-72 rounded-3xl border-2 border-[#F5E6CC]" />
-);
-
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -254,10 +252,7 @@ const MyOrders = () => {
         </Reveal>
 
         {loading ? (
-          <div className="mt-12 space-y-5">
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
+          <Loader />
         ) : orders.length === 0 ? (
           <Reveal className="mt-14">
             <div className="rounded-3xl border-2 border-dashed border-[#F5E6CC] bg-[#FFF9ED] px-6 py-14 text-center">

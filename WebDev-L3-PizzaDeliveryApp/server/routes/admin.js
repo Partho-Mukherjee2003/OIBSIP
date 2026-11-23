@@ -41,5 +41,15 @@ router.patch("/inventory/:id", verifyToken, verifyAdmin, async (req, res) => {
   await item.save();
   res.json({ message: "Stock updated", item });
 });
-
+// PATCH /api/admin/orders/:id/cancel — unpaid order cancel
+router.patch("/orders/:id/cancel", verifyToken, verifyAdmin, async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.paymentStatus === "Paid") {
+    return res.status(400).json({ message: "Paid order cannot be cancelled" });
+  }
+  order.status = "Cancelled";
+  await order.save();
+  res.json({ message: "Order cancelled", order });
+});
 export default router;

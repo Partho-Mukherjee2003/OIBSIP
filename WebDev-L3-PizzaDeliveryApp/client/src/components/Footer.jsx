@@ -8,6 +8,8 @@ import {
   FaInstagram,
   FaTwitter,
 } from "react-icons/fa";
+import ReviewForm from "./ReviewForm";
+
 
 const Footer = () => {
   return (
@@ -51,36 +53,7 @@ const Footer = () => {
         </div>
 
         <div className="md:justify-self-center">
-          <h3 className="mb-4 text-lg font-bold uppercase text-white">
-            Quick Links
-          </h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link to="/" className="transition hover:text-[#F7941D]">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/menu" className="transition hover:text-[#F7941D]">
-                Menu
-              </Link>
-            </li>
-            <li>
-              <Link to="/builder" className="transition hover:text-[#F7941D]">
-                Custom Pizza
-              </Link>
-            </li>
-            <li>
-              <Link to="/login" className="transition hover:text-[#F7941D]">
-                Login
-              </Link>
-            </li>
-            <li>
-              <Link to="/register" className="transition hover:text-[#F7941D]">
-                Register
-              </Link>
-            </li>
-          </ul>
+          <ReviewForm />
         </div>
 
         <div className="md:justify-self-end">

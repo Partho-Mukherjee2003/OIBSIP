@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaStar } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaStar,
+  FaSpinner,
+} from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const Login = () => {
@@ -8,11 +15,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/api/auth/login`,
@@ -29,7 +38,7 @@ const Login = () => {
         setEmail("");
         setPassword("");
         toast.success("Login successful!");
-        navigate("/dashboard");
+        navigate(data.user.role === "admin" ? "/admin" : "/dashboard");
       } else {
         setMessage(data.message || "Login failed");
         toast.error(data.message || "Login failed");
@@ -37,6 +46,8 @@ const Login = () => {
     } catch {
       setMessage("Server error. Please try again.");
       toast.error("Server error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,8 +157,22 @@ const Login = () => {
             </div>
           )}
 
-          <button className="mt-6 w-full cursor-pointer rounded-full bg-[#F7941D] py-3 font-bold uppercase text-black transition duration-200 hover:-translate-y-0.5 hover:bg-[#e07f0a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1f1f1f] active:translate-y-0 active:scale-95">
-            Login
+          <button
+            disabled={loading}
+            className={`mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 font-bold uppercase text-black transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1f1f1f] ${
+              loading
+                ? "cursor-not-allowed bg-[#b06a12]"
+                : "cursor-pointer bg-[#F7941D] hover:-translate-y-0.5 hover:bg-[#e07f0a] active:translate-y-0 active:scale-95"
+            }`}
+          >
+            {loading ? (
+              <>
+                <FaSpinner className="animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
 
           <div className="my-5 h-px bg-[#262626]" />

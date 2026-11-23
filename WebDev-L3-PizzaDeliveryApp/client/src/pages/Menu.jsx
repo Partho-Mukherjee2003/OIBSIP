@@ -1,14 +1,43 @@
 import { useEffect, useState } from "react";
+import { FaSearch } from "react-icons/fa";
+import Loader from "../components/Loader";
 
 const Menu = () => {
   const [pizzas, setPizzas] = useState([]);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [sort, setSort] = useState("default");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/api/pizzas`)
       .then((res) => res.json())
       .then((data) => setPizzas(data))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   }, []);
+
+  // Search + category filter
+  let filtered = pizzas.filter((pizza) => {
+    const matchSearch = pizza.name.toLowerCase().includes(search.toLowerCase());
+    const matchCategory = category === "All" || pizza.category === category;
+    return matchSearch && matchCategory;
+  });
+
+  // Sorting
+  if (sort === "price-low")
+    filtered = [...filtered].sort((a, b) => a.price - b.price);
+  if (sort === "price-high")
+    filtered = [...filtered].sort((a, b) => b.price - a.price);
+  if (sort === "name")
+    filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+
+  const filterBtn = (label) =>
+    `rounded-full px-4 py-1.5 text-xs font-bold uppercase transition ${
+      category === label
+        ? "bg-[#F7941D] text-white"
+        : "border border-[#F5E6CC] bg-[#FFF9ED] text-gray-600 hover:border-[#F7941D]"
+    }`;
 
   return (
     <section className="bg-white py-14 text-gray-600 sm:py-20">
@@ -27,50 +56,96 @@ const Menu = () => {
           </p>
         </div>
 
-        {/* Cards */}
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {pizzas.map((pizza) => (
-            <div
-              key={pizza._id}
-              className="group flex h-full flex-col overflow-hidden rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] shadow-sm transition duration-300 hover:-translate-y-2 hover:border-[#F7941D] hover:shadow-[0_20px_40px_-15px_rgba(247,148,29,0.45)]"
+        {/* Search + Filter + Sort bar */}
+        <div className="mt-10 flex flex-col items-center gap-4">
+          <div className="flex w-full max-w-xl flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search pizza by name..."
+                className="w-full rounded-full border-2 border-[#F5E6CC] bg-[#FFF9ED] py-2.5 pl-11 pr-4 text-sm text-[#141414] outline-none transition focus:border-[#F7941D]"
+              />
+            </div>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="cursor-pointer rounded-full border-2 border-[#F5E6CC] bg-[#FFF9ED] px-4 py-2.5 text-sm font-semibold text-[#141414] outline-none transition focus:border-[#F7941D]"
             >
-              {/* Image */}
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={pizza.image}
-                  alt={pizza.name}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                />
-                <span
-                  className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-bold text-white shadow ${
-                    pizza.category === "Veg" ? "bg-green-600" : "bg-red-600"
-                  }`}
-                >
-                  {pizza.category}
-                </span>
-                <span className="absolute bottom-3 right-3 rounded-full bg-[#141414]/85 px-3 py-1 text-sm font-extrabold text-[#F7941D]">
-                  ₹{pizza.price}
-                </span>
-              </div>
+              <option value="default">Sort: Default</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name">Name: A to Z</option>
+            </select>
+          </div>
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col p-5">
-                <h3 className="text-xl font-extrabold uppercase text-[#141414] transition-colors duration-200 group-hover:text-[#F7941D]">
-                  {pizza.name}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-500">
-                  {pizza.description}
-                </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {["All", "Veg", "Non-Veg"].map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={filterBtn(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <div className="mt-auto pt-4">
-                  <button className="w-full cursor-pointer rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white transition duration-200 hover:bg-[#141414] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 active:scale-95">
-                    Order Now
-                  </button>
+        {/* Cards */}
+        {loading ? (
+          <Loader />
+        ) : filtered.length === 0 ? (
+          <p className="mt-14 text-center text-lg font-semibold text-gray-500">
+            No pizza found. Try another search.
+          </p>
+        ) : (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((pizza) => (
+              <div
+                key={pizza._id}
+                className="group flex h-full flex-col overflow-hidden rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] shadow-sm transition duration-300 hover:-translate-y-2 hover:border-[#F7941D] hover:shadow-[0_20px_40px_-15px_rgba(247,148,29,0.45)]"
+              >
+                {/* Image */}
+                <div className="relative h-52 overflow-hidden">
+                  <img
+                    src={pizza.image}
+                    alt={pizza.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                  />
+                  <span
+                    className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-bold text-white shadow ${
+                      pizza.category === "Veg" ? "bg-green-600" : "bg-red-600"
+                    }`}
+                  >
+                    {pizza.category}
+                  </span>
+                  <span className="absolute bottom-3 right-3 rounded-full bg-[#141414]/85 px-3 py-1 text-sm font-extrabold text-[#F7941D]">
+                    ₹{pizza.price}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="text-xl font-extrabold uppercase text-[#141414] transition-colors duration-200 group-hover:text-[#F7941D]">
+                    {pizza.name}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-500">
+                    {pizza.description}
+                  </p>
+
+                  <div className="mt-auto pt-4">
+                    <button className="w-full cursor-pointer rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white transition duration-200 hover:bg-[#141414] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 active:scale-95">
+                      Order Now
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

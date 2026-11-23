@@ -48,6 +48,7 @@ export default function Navbar() {
   const token = localStorage.getItem("token");
   const user = getUser();
   const isAdmin = user?.role === "admin";
+  const firstName = (user?.name || "").split(" ")[0];
 
   // Role onujayi links — admin: Admin panel, user: Dashboard
   const links = !token
@@ -111,10 +112,18 @@ export default function Navbar() {
             0 items · $0.00
           </Link>
 
-          {/* Logged in: profile picture + highlighted logout button */}
+          {/* Logged in: profile pic + first name (click = Profile page) + logout */}
           {token && (
             <div className="flex items-center gap-3 border-l border-white/10 pl-4 xl:pl-5">
-              <Avatar user={user} />
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 transition hover:opacity-80"
+              >
+                <Avatar user={user} />
+                <span className="max-w-24 truncate text-sm font-bold capitalize">
+                  {firstName}
+                </span>
+              </Link>
               <button onClick={handleLogout} className={logoutBtnClass}>
                 <FaSignOutAlt />
                 Logout
@@ -138,11 +147,15 @@ export default function Navbar() {
         <div className="border-t border-white/10 bg-[#191919] px-4 py-5 xl:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-5">
             {token && (
-              <div className="flex items-center gap-3 border-b border-white/10 pb-5">
+              <Link
+                to="/profile"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 border-b border-white/10 pb-5"
+              >
                 <Avatar user={user} />
                 <div className="min-w-0">
-                  <p className="truncate font-bold">
-                    {user?.name || "My Account"}
+                  <p className="truncate font-bold capitalize">
+                    {firstName || "My Account"}
                   </p>
                   {user?.email && (
                     <p className="truncate text-xs text-gray-400">
@@ -150,7 +163,7 @@ export default function Navbar() {
                     </p>
                   )}
                 </div>
-              </div>
+              </Link>
             )}
 
             {links.map(([label, to]) => (

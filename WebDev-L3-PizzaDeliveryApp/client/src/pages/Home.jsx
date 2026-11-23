@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import Banner from "../components/Banner";
+import Loader from "../components/Loader";
+import Features from "../components/Features";
+import Reviews from "../components/Reviews";
+import RollingPizza from "../components/RollingPizza";
+
 
 const Home = () => {
   const [pizzas, setPizzas] = useState([]);
@@ -25,7 +30,8 @@ const Home = () => {
   return (
     <div>
       <Banner />
-
+      <Features />
+      <RollingPizza />
       <section className="bg-white px-4 py-14 text-black sm:px-6 sm:py-20 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Heading */}
@@ -44,26 +50,7 @@ const Home = () => {
           </div>
 
           {loading ? (
-            /* Skeleton cards while loading */
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse overflow-hidden rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED]"
-                >
-                  <div className="h-52 bg-gray-200" />
-                  <div className="space-y-3 p-5">
-                    <div className="h-5 w-2/3 rounded bg-gray-200" />
-                    <div className="h-3 w-full rounded bg-gray-200" />
-                    <div className="h-3 w-4/5 rounded bg-gray-200" />
-                    <div className="flex items-center justify-between pt-3">
-                      <div className="h-6 w-16 rounded bg-gray-200" />
-                      <div className="h-9 w-20 rounded-full bg-gray-200" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Loader />
           ) : (
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {pizzas.map((pizza) => (
@@ -115,6 +102,8 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      <Reviews />
     </div>
   );
 };

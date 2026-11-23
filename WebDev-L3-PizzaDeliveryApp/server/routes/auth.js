@@ -176,5 +176,20 @@ router.post("/reset-password/:token", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
+// PATCH /api/auth/profile — name + photo update
+router.patch("/profile", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (req.body.name) user.name = req.body.name;
+    if (req.body.image !== undefined) user.image = req.body.image;
+    await user.save();
+    res.json({
+      message: "Profile updated",
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, image: user.image },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 export default router;

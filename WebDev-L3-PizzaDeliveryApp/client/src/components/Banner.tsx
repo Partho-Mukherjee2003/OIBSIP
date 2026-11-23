@@ -7,7 +7,7 @@ const slides = [
     title2: "FOODS",
     subtitle: "HEALTHY FOOD FOR HEALTHY BODY",
     text: "Fresh dough, rich tomato sauce and premium cheese — baked hot and delivered fast to your door.",
-    image: "/images/banner-1-removebg-preview.png",
+    image: "/images/rolling/pizza3-removebg-preview.png",
     layout: "left",
   },
   {
@@ -111,17 +111,17 @@ const Banner = () => {
           <img
             src="/images/veg-onion-slice.png"
             alt=""
-            className="absolute bottom-[220px] left-[24%] w-36 animate-float z-10 hidden md:block drop-shadow-2xl"
+            className="absolute bottom-[260px] left-[24%] w-36 animate-float z-10 hidden md:block drop-shadow-2xl"
           />
           <img
             src="/images/veg-chili-whole.png"
             alt=""
-            className="absolute bottom-[260px] right-[20%] w-40 animate-float-delay z-10 hidden md:block drop-shadow-2xl"
+            className="absolute bottom-[300px] right-[20%] w-40 animate-float-delay z-10 hidden md:block drop-shadow-2xl"
           />
           <img
             src={slide.image}
             alt="Pizza"
-            className="animate-slide-left absolute left-1/2 -translate-x-1/2 -bottom-[320px] md:-bottom-[380px] w-[560px] h-[560px] md:w-[760px] md:h-[760px] object-cover rounded-full border-8 border-[#1f1f1f]"
+            className="animate-slide-left absolute bottom-0 left-1/2 -translate-x-1/2 w-[440px] md:w-[640px] object-contain drop-shadow-2xl"
           />
         </div>
       ) : (

@@ -12,6 +12,8 @@ import MyOrders from "./pages/MyOrders";
 import AdminOrders from "./pages/AdminOrders";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminInventory from "./pages/AdminInventory";
+import Profile from "./pages/Profile";
+import Verify from "./pages/Verify";
 
 
 
@@ -32,6 +34,8 @@ const App = () => {
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/inventory" element={<AdminInventory />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/verify" element={<Verify />} />
       </Routes>
       <Footer />
     </div>

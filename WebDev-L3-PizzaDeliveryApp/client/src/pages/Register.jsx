@@ -10,6 +10,7 @@ import {
   FaTruck,
   FaTags,
   FaCheckCircle,
+  FaSpinner,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -38,11 +39,13 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage("");
     setIsSuccess(false);
+    setLoading(true);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/api/auth/register`,
@@ -69,6 +72,8 @@ const Register = () => {
     } catch {
       setMessage("Server error. Please try again.");
       toast.error("Server error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -197,8 +202,22 @@ const Register = () => {
             </div>
           )}
 
-          <button className="mt-6 w-full cursor-pointer rounded-full bg-[#F7941D] py-3 font-bold uppercase text-black transition duration-200 hover:-translate-y-0.5 hover:bg-[#e07f0a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1f1f1f] active:translate-y-0 active:scale-95">
-            Register
+          <button
+            disabled={loading}
+            className={`mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 font-bold uppercase text-black transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1f1f1f] ${
+              loading
+                ? "cursor-not-allowed bg-[#b06a12]"
+                : "cursor-pointer bg-[#F7941D] hover:-translate-y-0.5 hover:bg-[#e07f0a] active:translate-y-0 active:scale-95"
+            }`}
+          >
+            {loading ? (
+              <>
+                <FaSpinner className="animate-spin" />
+                Registering...
+              </>
+            ) : (
+              "Register"
+            )}
           </button>
 
           <p className="mt-4 text-center text-xs leading-relaxed text-gray-500">

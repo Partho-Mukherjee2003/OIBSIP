@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 const AdminInventory = () => {
   const [items, setItems] = useState([]);
   const [stocks, setStocks] = useState({});
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchItems = async () => {
@@ -22,6 +24,7 @@ const AdminInventory = () => {
       data.forEach((i) => (obj[i._id] = i.stock));
       setStocks(obj);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -57,37 +60,41 @@ const AdminInventory = () => {
           Admin <span className="text-[#F7941D]">Inventory</span>
         </h2>
 
-        <div className="mt-10 space-y-3">
-          {items.map((item) => (
-            <div
-              key={item._id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-4"
-            >
-              <div>
-                <p className="font-bold">{item.name}</p>
-                <p className="text-xs uppercase text-gray-500">
-                  {item.category} · ₹{item.price}
-                </p>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="mt-10 space-y-3">
+            {items.map((item) => (
+              <div
+                key={item._id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-4"
+              >
+                <div>
+                  <p className="font-bold">{item.name}</p>
+                  <p className="text-xs uppercase text-gray-500">
+                    {item.category} · ₹{item.price}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={stocks[item._id] ?? item.stock}
+                    onChange={(e) =>
+                      setStocks({ ...stocks, [item._id]: e.target.value })
+                    }
+                    className="w-24 rounded-full border border-[#F5E6CC] bg-white px-3 py-1.5 text-sm"
+                  />
+                  <button
+                    onClick={() => updateStock(item._id)}
+                    className="rounded-full bg-[#F7941D] px-4 py-1.5 text-xs font-bold text-white"
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={stocks[item._id] ?? item.stock}
-                  onChange={(e) =>
-                    setStocks({ ...stocks, [item._id]: e.target.value })
-                  }
-                  className="w-24 rounded-full border border-[#F5E6CC] bg-white px-3 py-1.5 text-sm"
-                />
-                <button
-                  onClick={() => updateStock(item._id)}
-                  className="rounded-full bg-[#F7941D] px-4 py-1.5 text-xs font-bold text-white"
-                >
-                  Update
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

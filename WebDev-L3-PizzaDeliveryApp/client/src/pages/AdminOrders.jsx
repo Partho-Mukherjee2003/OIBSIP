@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
@@ -17,6 +19,7 @@ const AdminOrders = () => {
     const data = await res.json();
     if (res.ok) setOrders(data);
     else toast.error(data.message || "Failed to load orders");
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -49,6 +52,23 @@ const AdminOrders = () => {
     }
   };
 
+  const cancelOrder = async (id) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/api/admin/orders/${id}/cancel`,
+      {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    if (res.ok) {
+      toast.success("Order cancelled");
+      fetchOrders();
+    } else {
+      toast.error("Cancel failed");
+    }
+  };
+
   return (
     <section className="min-h-[80vh] bg-white px-4 py-16 text-[#141414]">
       <div className="mx-auto max-w-5xl">
@@ -56,54 +76,81 @@ const AdminOrders = () => {
           Admin <span className="text-[#F7941D]">Orders</span>
         </h2>
 
-        <div className="mt-10 space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order._id}
-              className="rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-5"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-lg font-extrabold">
-                    #{order._id.slice(-6)}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {order.user?.name} · {order.user?.email}
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {order.items.map((i) => i.name).join(", ")}
-                  </p>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="mt-10 space-y-4">
+            {orders.map((order) => (
+              <div
+                key={order._id}
+                className="rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-5"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-lg font-extrabold">
+                      #{order._id.slice(-6)}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {order.user?.name} · {order.user?.email}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {order.items.map((i) => i.name).join(", ")}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-extrabold text-[#F7941D]">
+                      ₹{order.totalAmount}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Payment: {order.paymentStatus}
+                    </p>
+                    <p className="text-sm font-bold">
+                      Status:{" "}
+                      <span
+                        className={
+                          order.status === "Cancelled"
+                            ? "text-red-600"
+                            : "text-gray-700"
+                        }
+                      >
+                        {order.status}
+                      </span>
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-extrabold text-[#F7941D]">
-                    ₹{order.totalAmount}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Payment: {order.paymentStatus}
-                  </p>
-                </div>
-              </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {["Order Received", "In Kitchen", "Sent to Delivery"].map(
-                  (s) => (
-                    <button
-                      key={s}
-                      onClick={() => changeStatus(order._id, s)}
-                      className={`rounded-full px-4 py-1.5 text-xs font-bold ${
-                        order.status === s
-                          ? "bg-[#F7941D] text-white"
-                          : "border border-[#F5E6CC] bg-white text-gray-600"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ),
+                {order.status !== "Cancelled" && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["Order Received", "In Kitchen", "Sent to Delivery"].map(
+                      (s) => (
+                        <button
+                          key={s}
+                          onClick={() => changeStatus(order._id, s)}
+                          className={`rounded-full px-4 py-1.5 text-xs font-bold ${
+                            order.status === s
+                              ? "bg-[#F7941D] text-white"
+                              : "border border-[#F5E6CC] bg-white text-gray-600"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ),
+                    )}
+
+                    {order.paymentStatus === "Pending" && (
+                      <button
+                        onClick={() => cancelOrder(order._id)}
+                        className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
