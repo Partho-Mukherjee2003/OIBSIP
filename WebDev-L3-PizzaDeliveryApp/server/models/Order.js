@@ -39,6 +39,8 @@ const orderSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: null,
     },
+    hiddenForUser: { type: Boolean, default: false },
+    hiddenForAdmin: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

@@ -117,11 +117,15 @@ const Timeline = ({ status }) => {
   );
 };
 
-const OrderCard = ({ order, index, onCancel }) => {
+const OrderCard = ({ order, index, onCancel, onRemove }) => {
   const names = order.items.map((i) => i.name);
   const paid = String(order.paymentStatus).toLowerCase() === "paid";
   const cancelled = order.status === "Cancelled";
   const canCancel = !paid && order.status === "Order Received";
+  const canRemove =
+    cancelled ||
+    (!paid && order.status === "Order Received") ||
+    order.status === "Sent to Delivery";
 
   return (
     <Reveal delay={Math.min(index, 5) * 80}>
@@ -241,6 +245,17 @@ const OrderCard = ({ order, index, onCancel }) => {
             Cancel Order
           </button>
         )}
+
+        {/* remove from list button */}
+        {canRemove && (
+          <button
+            type="button"
+            onClick={() => onRemove(order._id)}
+            className="mt-3 w-full rounded-full border-2 border-gray-200 bg-white py-2.5 text-sm font-bold uppercase text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
+          >
+            Remove from List
+          </button>
+        )}
       </article>
     </Reveal>
   );
@@ -282,6 +297,28 @@ const MyOrders = () => {
         fetchOrders();
       } else {
         toast.error(data.message || "Cancel failed");
+      }
+    } catch {
+      toast.error("Server error. Please try again.");
+    }
+  };
+
+  const removeOrder = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/api/orders/${id}/hide`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Removed from your list");
+        fetchOrders();
+      } else {
+        toast.error(data.message || "Remove failed");
       }
     } catch {
       toast.error("Server error. Please try again.");
@@ -335,6 +372,7 @@ const MyOrders = () => {
                 order={order}
                 index={i}
                 onCancel={cancelOrder}
+                onRemove={removeOrder}
               />
             ))}
           </div>

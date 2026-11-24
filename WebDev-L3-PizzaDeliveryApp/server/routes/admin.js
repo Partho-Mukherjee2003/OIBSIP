@@ -7,7 +7,7 @@ const router = express.Router();
 
 // GET /api/admin/orders — shob order
 router.get("/orders", verifyToken, verifyAdmin, async (req, res) => {
-  const orders = await Order.find()
+  const orders = await Order.find({ hiddenForAdmin: { $ne: true } })
     .populate("user", "name email")
     .sort({ createdAt: -1 });
   res.json(orders);
@@ -65,4 +65,12 @@ router.patch(
     res.json({ message: "Order cancelled", order });
   },
 );
+// PATCH /api/admin/orders/:id/hide — admin-er list theke sorano
+router.patch("/orders/:id/hide", verifyToken, verifyAdmin, async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  order.hiddenForAdmin = true;
+  await order.save();
+  res.json({ message: "Removed from list", order });
+});
 export default router;

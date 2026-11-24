@@ -71,6 +71,24 @@ const AdminOrders = () => {
     }
   };
 
+  const removeOrder = async (id) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/api/admin/orders/${id}/hide`,
+      {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    const data = await res.json();
+    if (res.ok) {
+      toast.success("Removed from list");
+      fetchOrders();
+    } else {
+      toast.error(data.message || "Remove failed");
+    }
+  };
+
   return (
     <section className="min-h-[80vh] bg-white px-4 py-16 text-[#141414]">
       <div className="mx-auto max-w-5xl">
@@ -172,6 +190,17 @@ const AdminOrders = () => {
                       </button>
                     )}
                   </div>
+                )}
+
+                {(order.status === "Cancelled" ||
+                  (order.paymentStatus === "Paid" &&
+                    order.status === "Sent to Delivery")) && (
+                  <button
+                    onClick={() => removeOrder(order._id)}
+                    className="mt-3 rounded-full border-2 border-gray-200 bg-white px-4 py-1.5 text-xs font-bold text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
+                  >
+                    Remove from List
+                  </button>
                 )}
               </div>
             ))}
