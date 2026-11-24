@@ -169,6 +169,24 @@ const OrderCard = ({ order, index }) => {
           </div>
         </div>
 
+        {/* delivery address */}
+        {(order.phone || order.address?.details) && (
+          <div className="mt-6 rounded-2xl bg-white p-4 text-sm">
+            <p className="text-xs uppercase tracking-widest text-gray-500">
+              Deliver to
+            </p>
+            {order.phone && (
+              <p className="mt-2 text-gray-700">Phone: {order.phone}</p>
+            )}
+            {order.address?.details && (
+              <p className="text-gray-700">
+                {order.address.details}, {order.address.city},{" "}
+                {order.address.state}, {order.address.country}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* footer */}
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div>

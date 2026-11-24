@@ -3,6 +3,7 @@ import { GiWheat } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import OrderDialog from "../components/OrderDialog";
 
 // base name onujayi real pic (Whole Wheat-e wheat icon)
 const baseVisual = {
@@ -243,6 +244,7 @@ const Builder = () => {
   const [sauce, setSauce] = useState(null);
   const [cheese, setCheese] = useState(null);
   const [vegs, setVegs] = useState([]);
+  const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -275,13 +277,24 @@ const Builder = () => {
   const ready = base && sauce && cheese;
   const done = [base, sauce, cheese].filter(Boolean).length;
 
-  const handleOrder = async () => {
+  const openDialog = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Please login first");
       navigate("/login");
       return;
     }
+    setShowDialog(true);
+  };
+
+  const handleOrder = async (delivery) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
+    setShowDialog(false);
 
     try {
       // 1. Order banao
@@ -296,6 +309,8 @@ const Builder = () => {
           sauceId: sauce._id,
           cheeseId: cheese._id,
           vegIds: vegs.map((v) => v._id),
+          address: delivery?.address,
+          phone: delivery?.phone,
         }),
       });
 
@@ -525,7 +540,7 @@ const Builder = () => {
 
                 <button
                   type="button"
-                  onClick={handleOrder}
+                  onClick={openDialog}
                   disabled={!ready}
                   className={`mt-5 w-full rounded-full px-8 py-3.5 font-bold uppercase transition-all duration-300 ${
                     ready
@@ -552,7 +567,7 @@ const Builder = () => {
           </div>
           <button
             type="button"
-            onClick={handleOrder}
+            onClick={openDialog}
             disabled={!ready}
             className={`rounded-full px-6 py-3 text-sm font-bold uppercase transition ${
               ready
@@ -564,6 +579,14 @@ const Builder = () => {
           </button>
         </div>
       </div>
+
+      {/* Delivery address dialog */}
+      <OrderDialog
+        open={showDialog}
+        total={total}
+        onClose={() => setShowDialog(false)}
+        onConfirm={handleOrder}
+      />
     </section>
   );
 };

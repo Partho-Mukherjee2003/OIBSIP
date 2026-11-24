@@ -8,7 +8,7 @@ const router = express.Router();
 // POST /api/orders — notun order (custom pizza)
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { baseId, sauceId, cheeseId, vegIds } = req.body;
+    const { baseId, sauceId, cheeseId, vegIds, address, phone } = req.body;
 
     const ids = [baseId, sauceId, cheeseId, ...(vegIds || [])];
     const items = await Inventory.find({ _id: { $in: ids } });
@@ -37,6 +37,8 @@ router.post("/", verifyToken, async (req, res) => {
       user: req.user.id,
       items: orderItems,
       totalAmount,
+      address: address || {},
+      phone: phone || "",
     });
 
     // stock komao

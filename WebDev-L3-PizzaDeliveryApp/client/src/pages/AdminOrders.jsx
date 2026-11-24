@@ -119,6 +119,23 @@ const AdminOrders = () => {
                   </div>
                 </div>
 
+                {(order.phone || order.address?.details) && (
+                  <div className="mt-4 rounded-2xl bg-white p-4 text-sm">
+                    <p className="font-extrabold uppercase text-[#141414]">
+                      Delivery Address
+                    </p>
+                    {order.phone && (
+                      <p className="mt-1 text-gray-600">Phone: {order.phone}</p>
+                    )}
+                    {order.address?.details && (
+                      <p className="text-gray-600">
+                        {order.address.details}, {order.address.city},{" "}
+                        {order.address.state}, {order.address.country}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {order.status !== "Cancelled" && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {["Order Received", "In Kitchen", "Sent to Delivery"].map(

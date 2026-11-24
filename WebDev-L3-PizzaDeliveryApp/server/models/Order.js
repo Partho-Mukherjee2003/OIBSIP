@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     items: [
       {
         name: { type: String, required: true },
@@ -23,6 +27,13 @@ const orderSchema = new mongoose.Schema(
     },
     razorpayOrderId: { type: String, default: "" },
     razorpayPaymentId: { type: String, default: "" },
+    address: {
+      country: { type: String, default: "" },
+      state: { type: String, default: "" },
+      city: { type: String, default: "" },
+      details: { type: String, default: "" },
+    },
+    phone: { type: String, default: "" },
   },
   { timestamps: true },
 );
