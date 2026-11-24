@@ -27,16 +27,21 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-
+// MongoDB connect (Vercel-eo cholbe, local-eo cholbe)
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB connected to:", mongoose.connection.name);
-    startStockAlert();
   })
   .catch((err) => console.log("MongoDB error:", err.message));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default app;
+
+// Local-e chalalei shudhu port-e listen korbe (Vercel-e listen lagbe na)
+if (process.env.VERCEL !== "1") {
+  startStockAlert();
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
