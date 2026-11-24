@@ -15,7 +15,7 @@ const slides = [
     title2: "PIZZAS",
     subtitle: "FRESH FROM OUR OVEN",
     text: "From classic Margherita to spicy Jalapeno — every pizza is made fresh when you order.",
-    image: "/images/banner2-removebg-preview(1).png",
+    image: "/images/banner-3.png",
     layout: "right",
   },
   {
@@ -23,7 +23,7 @@ const slides = [
     title2: "PIZZA",
     subtitle: "BUILD YOUR OWN PIZZA",
     text: "Choose your base, sauce, cheese and favourite vegetables. Your pizza, your way.",
-    image: "/images/banner3.png",
+    image: "/images/rolling/pizzaa7-removebg-preview.png",
     layout: "bottom",
   },
 ];
@@ -121,7 +121,7 @@ const Banner = () => {
           <img
             src={slide.image}
             alt="Pizza"
-            className="animate-slide-left absolute bottom-0 left-1/2 -translate-x-1/2 w-[440px] md:w-[640px] object-contain drop-shadow-2xl"
+            className="animate-slide-left absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[440px] md:w-[640px] object-contain drop-shadow-2xl"
           />
         </div>
       ) : (

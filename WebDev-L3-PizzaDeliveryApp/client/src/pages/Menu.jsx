@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Loader from "../components/Loader";
 import { useCart } from "../context/useCart";
 
 const Menu = () => {
+  const [searchParams] = useSearchParams();
   const [pizzas, setPizzas] = useState([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [sort, setSort] = useState("default");
+  const [category, setCategory] = useState(
+    searchParams.get("category") || "All",
+  );
+  const [sort, setSort] = useState(searchParams.get("sort") || "default");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
@@ -20,11 +25,12 @@ const Menu = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Search + category filter
+  // Search + category + price filter
   let filtered = pizzas.filter((pizza) => {
     const matchSearch = pizza.name.toLowerCase().includes(search.toLowerCase());
     const matchCategory = category === "All" || pizza.category === category;
-    return matchSearch && matchCategory;
+    const matchPrice = !maxPrice || pizza.price <= Number(maxPrice);
+    return matchSearch && matchCategory && matchPrice;
   });
 
   // Sorting
@@ -88,12 +94,23 @@ const Menu = () => {
             {["All", "Veg", "Non-Veg"].map((c) => (
               <button
                 key={c}
-                onClick={() => setCategory(c)}
+                onClick={() => {
+                  setCategory(c);
+                  setMaxPrice("");
+                }}
                 className={filterBtn(c)}
               >
                 {c}
               </button>
             ))}
+            {maxPrice && (
+              <button
+                onClick={() => setMaxPrice("")}
+                className="rounded-full bg-[#141414] px-4 py-1.5 text-xs font-bold uppercase text-white transition hover:bg-red-600"
+              >
+                Under ₹{maxPrice} ×
+              </button>
+            )}
           </div>
         </div>
 
