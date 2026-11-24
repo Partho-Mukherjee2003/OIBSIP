@@ -97,5 +97,23 @@ router.get("/my", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
+// User cancel order — shudhu unpaid + Order Received hole
+router.patch("/:id/cancel", verifyToken, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.user.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not your order" });
+    if (order.paymentStatus === "Paid")
+      return res.status(400).json({ message: "Paid order cannot be cancelled" });
+    if (order.status !== "Order Received")
+      return res.status(400).json({ message: "Order already in progress, cannot cancel" });
+    order.status = "Cancelled";
+    order.cancelledBy = "user";
+    await order.save();
+    res.json({ message: "Order cancelled", order });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 export default router;

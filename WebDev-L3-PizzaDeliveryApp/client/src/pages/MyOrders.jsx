@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import Loader from "../components/Loader";
 
 const statusColor = {
@@ -116,10 +117,11 @@ const Timeline = ({ status }) => {
   );
 };
 
-const OrderCard = ({ order, index }) => {
+const OrderCard = ({ order, index, onCancel }) => {
   const names = order.items.map((i) => i.name);
   const paid = String(order.paymentStatus).toLowerCase() === "paid";
   const cancelled = order.status === "Cancelled";
+  const canCancel = !paid && order.status === "Order Received";
 
   return (
     <Reveal delay={Math.min(index, 5) * 80}>
@@ -148,6 +150,15 @@ const OrderCard = ({ order, index }) => {
         <p className="mt-3 text-sm text-gray-500">
           {statusNote[order.status] || "We're working on your order."}
         </p>
+
+        {/* ke cancel korlo */}
+        {cancelled && order.cancelledBy && (
+          <p className="mt-2 text-sm font-semibold text-red-600">
+            {order.cancelledBy === "user"
+              ? "Cancelled by you"
+              : "Cancelled by Pizza Dot"}
+          </p>
+        )}
 
         {!cancelled && <Timeline status={order.status} />}
 
@@ -219,6 +230,17 @@ const OrderCard = ({ order, index }) => {
             </p>
           </div>
         </div>
+
+        {/* cancel button — shudhu unpaid + Order Received hole */}
+        {canCancel && (
+          <button
+            type="button"
+            onClick={() => onCancel(order._id)}
+            className="mt-5 w-full rounded-full border-2 border-red-200 bg-white py-2.5 text-sm font-bold uppercase text-red-600 transition hover:bg-red-600 hover:text-white"
+          >
+            Cancel Order
+          </button>
+        )}
       </article>
     </Reveal>
   );
@@ -242,6 +264,28 @@ const MyOrders = () => {
       .then((data) => setOrders(Array.isArray(data) ? data : []))
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
+  };
+
+  const cancelOrder = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/api/orders/${id}/cancel`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Order cancelled");
+        fetchOrders();
+      } else {
+        toast.error(data.message || "Cancel failed");
+      }
+    } catch {
+      toast.error("Server error. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -286,7 +330,12 @@ const MyOrders = () => {
         ) : (
           <div className="mt-12 space-y-5">
             {orders.map((order, i) => (
-              <OrderCard key={order._id} order={order} index={i} />
+              <OrderCard
+                key={order._id}
+                order={order}
+                index={i}
+                onCancel={cancelOrder}
+              />
             ))}
           </div>
         )}

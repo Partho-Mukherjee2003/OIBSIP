@@ -21,6 +21,11 @@ router.patch(
   async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.status === "Cancelled") {
+      return res
+        .status(400)
+        .json({ message: "Cancelled order cannot be updated" });
+    }
     order.status = req.body.status;
     await order.save();
     res.json({ message: "Status updated", order });
@@ -42,14 +47,22 @@ router.patch("/inventory/:id", verifyToken, verifyAdmin, async (req, res) => {
   res.json({ message: "Stock updated", item });
 });
 // PATCH /api/admin/orders/:id/cancel — unpaid order cancel
-router.patch("/orders/:id/cancel", verifyToken, verifyAdmin, async (req, res) => {
-  const order = await Order.findById(req.params.id);
-  if (!order) return res.status(404).json({ message: "Order not found" });
-  if (order.paymentStatus === "Paid") {
-    return res.status(400).json({ message: "Paid order cannot be cancelled" });
-  }
-  order.status = "Cancelled";
-  await order.save();
-  res.json({ message: "Order cancelled", order });
-});
+router.patch(
+  "/orders/:id/cancel",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.paymentStatus === "Paid") {
+      return res
+        .status(400)
+        .json({ message: "Paid order cannot be cancelled" });
+    }
+    order.status = "Cancelled";
+    order.cancelledBy = "admin";
+    await order.save();
+    res.json({ message: "Order cancelled", order });
+  },
+);
 export default router;

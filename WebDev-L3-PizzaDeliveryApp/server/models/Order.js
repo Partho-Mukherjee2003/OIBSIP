@@ -34,6 +34,11 @@ const orderSchema = new mongoose.Schema(
       details: { type: String, default: "" },
     },
     phone: { type: String, default: "" },
+    cancelledBy: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "",
+    },
   },
   { timestamps: true },
 );

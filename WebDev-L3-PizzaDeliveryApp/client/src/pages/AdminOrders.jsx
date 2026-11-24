@@ -44,11 +44,12 @@ const AdminOrders = () => {
         body: JSON.stringify({ status }),
       },
     );
+    const data = await res.json();
     if (res.ok) {
       toast.success("Status updated");
       fetchOrders();
     } else {
-      toast.error("Update failed");
+      toast.error(data.message || "Update failed");
     }
   };
 
@@ -61,11 +62,12 @@ const AdminOrders = () => {
         headers: { Authorization: `Bearer ${token}` },
       },
     );
+    const data = await res.json();
     if (res.ok) {
       toast.success("Order cancelled");
       fetchOrders();
     } else {
-      toast.error("Cancel failed");
+      toast.error(data.message || "Cancel failed");
     }
   };
 
@@ -116,6 +118,13 @@ const AdminOrders = () => {
                         {order.status}
                       </span>
                     </p>
+                    {order.status === "Cancelled" && order.cancelledBy && (
+                      <p className="mt-1 text-sm font-bold text-red-600">
+                        {order.cancelledBy === "user"
+                          ? "Cancelled by User"
+                          : "Cancelled by Admin"}
+                      </p>
+                    )}
                   </div>
                 </div>
 
