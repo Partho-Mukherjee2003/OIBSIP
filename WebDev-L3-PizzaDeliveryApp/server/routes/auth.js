@@ -34,7 +34,8 @@ router.post("/register", async (req, res) => {
 
     await user.save();
 
-    const verifyLink = `http://localhost:5000/api/auth/verify/${verificationToken}`;
+    const serverUrl = process.env.SERVER_URL || "http://localhost:5000";
+    const verifyLink = `${serverUrl}/api/auth/verify/${verificationToken}`;
     await sendEmail(
       email,
       "Pizza Dot - Verify your email",
@@ -62,7 +63,12 @@ router.get("/verify/:token", async (req, res) => {
     user.verificationToken = null;
     await user.save();
 
-    res.send("Email verified successfully! Now you can login.");
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+    res.redirect(`${process.env.CLIENT_URL}/verify?token=${token}`);
   } catch (error) {
     res.status(500).send("Server error");
   }
@@ -138,11 +144,11 @@ router.post("/forgot-password", async (req, res) => {
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    const resetLink = `http://localhost:5000/api/auth/reset-password/${resetToken}`;
+    const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
     await sendEmail(
       email,
       "Pizza Dot - Reset your password",
-      `<h2>Reset Password</h2><p>Your reset token link: ${resetLink}</p><p>This link expires in 15 minutes.</p>`
+      `<h2>Reset Password</h2><p>Click to reset your password: <a href="${resetLink}">Reset Password</a></p><p>This link expires in 15 minutes.</p>`,
     );
 
     res.json({ message: "Reset email sent. Check your inbox." });
@@ -186,9 +192,62 @@ router.patch("/profile", verifyToken, async (req, res) => {
     await user.save();
     res.json({
       message: "Profile updated",
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, image: user.image },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      },
     });
   } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// Google Login
+router.post("/google", async (req, res) => {
+  try {
+    const { access_token } = req.body;
+    if (!access_token)
+      return res.status(400).json({ message: "No token provided" });
+
+    const googleRes = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      { headers: { Authorization: `Bearer ${access_token}` } },
+    );
+    const profile = await googleRes.json();
+    if (!profile.email)
+      return res.status(400).json({ message: "Google login failed" });
+
+    let user = await User.findOne({ email: profile.email });
+    if (!user) {
+      const randomPass = crypto.randomBytes(16).toString("hex");
+      const hashed = await bcrypt.hash(randomPass, 10);
+      user = await User.create({
+        name: profile.name,
+        email: profile.email,
+        password: hashed,
+        image: profile.picture || "",
+        isVerified: true,
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      },
+    });
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });

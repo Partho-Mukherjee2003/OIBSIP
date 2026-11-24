@@ -8,6 +8,8 @@ import {
   FaStar,
   FaSpinner,
 } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 
 const Login = () => {
@@ -50,6 +52,34 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  // Google diye login
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SERVER_URL}/api/auth/google`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ access_token: tokenResponse.access_token }),
+          },
+        );
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          toast.success("Login successful!");
+          navigate(data.user.role === "admin" ? "/admin" : "/dashboard");
+        } else {
+          toast.error(data.message || "Google login failed");
+        }
+      } catch {
+        toast.error("Server error. Please try again.");
+      }
+    },
+    onError: () => toast.error("Google login failed"),
+  });
 
   const inputClass =
     "w-full rounded-lg border border-transparent bg-[#262626] py-3 pl-11 pr-4 text-white placeholder-gray-500 outline-none transition duration-200 hover:border-[#3a3a3a] focus:border-[#F7941D] focus:ring-2 focus:ring-[#F7941D]/40";
@@ -148,6 +178,15 @@ const Login = () => {
             </button>
           </div>
 
+          <div className="mt-2 text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-semibold text-[#F7941D] transition hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
           {message && (
             <div
               role="alert"
@@ -175,9 +214,26 @@ const Login = () => {
             )}
           </button>
 
-          <div className="my-5 h-px bg-[#262626]" />
+          {/* OR divider */}
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-[#262626]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              OR
+            </span>
+            <span className="h-px flex-1 bg-[#262626]" />
+          </div>
 
-          <p className="text-center text-sm text-gray-400">
+          {/* Google login button */}
+          <button
+            type="button"
+            onClick={() => googleLogin()}
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-[#3a3a3a] bg-white py-3 font-bold text-[#141414] transition duration-200 hover:-translate-y-0.5 hover:bg-gray-100 active:scale-95"
+          >
+            <FcGoogle className="text-xl" />
+            Continue with Google
+          </button>
+
+          <p className="mt-5 text-center text-sm text-gray-400">
             New here?{" "}
             <Link
               to="/register"

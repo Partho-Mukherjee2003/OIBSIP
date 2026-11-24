@@ -15,6 +15,10 @@ import AdminInventory from "./pages/AdminInventory";
 import Profile from "./pages/Profile";
 import Verify from "./pages/Verify";
 import Cart from "./pages/Cart";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
+
 
 const App = () => {
   return (
@@ -36,6 +40,8 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </div>
