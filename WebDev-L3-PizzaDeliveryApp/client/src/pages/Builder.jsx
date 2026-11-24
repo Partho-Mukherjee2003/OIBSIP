@@ -360,8 +360,14 @@ const Builder = () => {
           }
         },
         theme: { color: "#F7941D" },
+        modal: {
+          ondismiss: () => {
+            toast.error("Payment cancelled");
+          },
+        },
       };
-      new window.Razorpay(options).open();
+      // dialogue bondho howar por ektu delay — mobile-e popup hang kore na
+      setTimeout(() => new window.Razorpay(options).open(), 300);
     } catch {
       toast.error("Server error. Please try again.");
     }
