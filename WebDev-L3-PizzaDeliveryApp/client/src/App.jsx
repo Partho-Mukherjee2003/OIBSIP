@@ -14,8 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminInventory from "./pages/AdminInventory";
 import Profile from "./pages/Profile";
 import Verify from "./pages/Verify";
-
-
+import Cart from "./pages/Cart";
 
 const App = () => {
   return (
@@ -36,6 +35,7 @@ const App = () => {
         <Route path="/admin/inventory" element={<AdminInventory />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
       <Footer />
     </div>

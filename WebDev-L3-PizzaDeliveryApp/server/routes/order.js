@@ -53,6 +53,39 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+// POST /api/orders/cart — cart-er menu pizza order
+router.post("/cart", verifyToken, async (req, res) => {
+  try {
+    const { items, address, phone } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    const orderItems = items.map((i) => ({
+      name: i.name,
+      price: i.price,
+      quantity: i.quantity || 1,
+    }));
+    const totalAmount = orderItems.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0,
+    );
+
+    const order = await Order.create({
+      user: req.user.id,
+      items: orderItems,
+      totalAmount,
+      address: address || {},
+      phone: phone || "",
+    });
+
+    res.status(201).json({ message: "Order placed successfully", order });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 // GET /api/orders/my — amar order gula
 router.get("/my", verifyToken, async (req, res) => {
   try {

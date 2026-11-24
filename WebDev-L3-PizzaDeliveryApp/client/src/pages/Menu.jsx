@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
+import toast from "react-hot-toast";
 import Loader from "../components/Loader";
+import { useCart } from "../context/useCart";
 
 const Menu = () => {
   const [pizzas, setPizzas] = useState([]);
@@ -8,6 +10,7 @@ const Menu = () => {
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("default");
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/api/pizzas`)
@@ -137,7 +140,13 @@ const Menu = () => {
                   </p>
 
                   <div className="mt-auto pt-4">
-                    <button className="w-full cursor-pointer rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white transition duration-200 hover:bg-[#141414] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 active:scale-95">
+                    <button
+                      onClick={() => {
+                        addToCart(pizza);
+                        toast.success(`${pizza.name} added to cart`);
+                      }}
+                      className="w-full cursor-pointer rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white transition duration-200 hover:bg-[#141414] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F7941D] focus-visible:ring-offset-2 active:scale-95"
+                    >
                       Order Now
                     </button>
                   </div>

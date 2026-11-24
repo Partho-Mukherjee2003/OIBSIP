@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { FaBars, FaPizzaSlice, FaTimes, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaBars,
+  FaPizzaSlice,
+  FaTimes,
+  FaSignOutAlt,
+  FaShoppingCart,
+} from "react-icons/fa";
 import toast from "react-hot-toast";
+import { useCart } from "../context/useCart";
 
 const navClass = ({ isActive }) =>
   `font-semibold tracking-wide transition-colors hover:text-[#F7941D] ${
@@ -44,6 +51,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   useLocation(); // page change hole navbar abar check korbe
+  const { totalItems, totalPrice } = useCart();
 
   const token = localStorage.getItem("token");
   const user = getUser();
@@ -106,10 +114,11 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-4 text-xs lg:flex xl:gap-5 xl:text-sm">
           <Link
-            to="/menu"
-            className="whitespace-nowrap rounded-full bg-[#F7941D] px-4 py-2.5 font-bold uppercase text-white transition hover:bg-[#e07f0a] sm:px-5"
+            to="/cart"
+            className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#F7941D] px-4 py-2.5 font-bold uppercase text-white transition hover:bg-[#e07f0a] sm:px-5"
           >
-            0 items · $0.00
+            <FaShoppingCart />
+            {totalItems} {totalItems === 1 ? "item" : "items"} · ₹{totalPrice}
           </Link>
 
           {/* Logged in: profile pic + first name (click = Profile page) + logout */}
@@ -179,11 +188,12 @@ export default function Navbar() {
             ))}
 
             <Link
-              to="/menu"
+              to="/cart"
               onClick={() => setOpen(false)}
-              className="w-fit rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase text-white"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-[#F7941D] px-5 py-2.5 text-sm font-bold uppercase text-white"
             >
-              0 items · $0.00
+              <FaShoppingCart />
+              {totalItems} {totalItems === 1 ? "item" : "items"} · ₹{totalPrice}
             </Link>
 
             {token && (
