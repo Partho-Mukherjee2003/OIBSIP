@@ -37,7 +37,7 @@ const orderSchema = new mongoose.Schema(
     cancelledBy: {
       type: String,
       enum: ["user", "admin"],
-      default: "",
+      default: null,
     },
   },
   { timestamps: true },
