@@ -17,12 +17,12 @@ import Verify from "./pages/Verify";
 import Cart from "./pages/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
-
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <div>
+      <ScrollToTop />
       <Navbar />
       <Toaster position="top-right" />
 
