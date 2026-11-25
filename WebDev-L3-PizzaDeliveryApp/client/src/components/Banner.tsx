@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const slides = [
@@ -100,12 +101,13 @@ const Banner = () => {
             >
               {slide.text}
             </p>
-            <button
-              className="animate-fade-up mt-5 bg-[#F7941D] hover:bg-[#e07f0a] px-8 py-3 rounded-full font-bold uppercase transition"
+            <Link
+              to="/builder"
+              className="animate-fade-up mt-5 inline-block bg-[#F7941D] hover:bg-[#e07f0a] px-8 py-3 rounded-full font-bold uppercase transition"
               style={{ animationDelay: "0.5s" }}
             >
               Build Now
-            </button>
+            </Link>
           </div>
 
           <img
@@ -158,12 +160,13 @@ const Banner = () => {
               >
                 {slide.text}
               </p>
-              <button
-                className="animate-fade-up mt-6 bg-[#F7941D] hover:bg-[#e07f0a] px-8 py-3 rounded-full font-bold uppercase transition"
+              <Link
+                to="/menu"
+                className="animate-fade-up mt-6 inline-block bg-[#F7941D] hover:bg-[#e07f0a] px-8 py-3 rounded-full font-bold uppercase transition"
                 style={{ animationDelay: "0.5s" }}
               >
                 Order Now
-              </button>
+              </Link>
             </div>
           </div>
         </div>
