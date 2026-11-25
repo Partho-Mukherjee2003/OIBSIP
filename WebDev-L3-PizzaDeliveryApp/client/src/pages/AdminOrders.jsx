@@ -100,110 +100,124 @@ const AdminOrders = () => {
           <Loader />
         ) : (
           <div className="mt-10 space-y-4">
-            {orders.map((order) => (
-              <div
-                key={order._id}
-                className="rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-5"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-lg font-extrabold">
-                      #{order._id.slice(-6)}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {order.user?.name} · {order.user?.email}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {order.items.map((i) => i.name).join(", ")}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-extrabold text-[#F7941D]">
-                      ₹{order.totalAmount}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Payment: {order.paymentStatus}
-                    </p>
-                    <p className="text-sm font-bold">
-                      Status:{" "}
-                      <span
-                        className={
-                          order.status === "Cancelled"
-                            ? "text-red-600"
-                            : "text-gray-700"
-                        }
-                      >
-                        {order.status}
-                      </span>
-                    </p>
-                    {order.status === "Cancelled" && order.cancelledBy && (
-                      <p className="mt-1 text-sm font-bold text-red-600">
-                        {order.cancelledBy === "user"
-                          ? "Cancelled by User"
-                          : "Cancelled by Admin"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {(order.phone || order.address?.details) && (
-                  <div className="mt-4 rounded-2xl bg-white p-4 text-sm">
-                    <p className="font-extrabold uppercase text-[#141414]">
-                      Delivery Address
-                    </p>
-                    {order.phone && (
-                      <p className="mt-1 text-gray-600">Phone: {order.phone}</p>
-                    )}
-                    {order.address?.details && (
-                      <p className="text-gray-600">
-                        {order.address.details}, {order.address.city},{" "}
-                        {order.address.state}, {order.address.country}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {order.status !== "Cancelled" && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {["Order Received", "In Kitchen", "Sent to Delivery"].map(
-                      (s) => (
-                        <button
-                          key={s}
-                          onClick={() => changeStatus(order._id, s)}
-                          className={`rounded-full px-4 py-1.5 text-xs font-bold ${
-                            order.status === s
-                              ? "bg-[#F7941D] text-white"
-                              : "border border-[#F5E6CC] bg-white text-gray-600"
-                          }`}
-                        >
-                          {s}
-                        </button>
-                      ),
-                    )}
-
-                    {order.paymentStatus === "Pending" && (
-                      <button
-                        onClick={() => cancelOrder(order._id)}
-                        className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
-                      >
-                        Cancel Order
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {(order.status === "Cancelled" ||
-                  (order.paymentStatus === "Paid" &&
-                    order.status === "Sent to Delivery")) && (
-                  <button
-                    onClick={() => removeOrder(order._id)}
-                    className="mt-3 rounded-full border-2 border-gray-200 bg-white px-4 py-1.5 text-xs font-bold text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
-                  >
-                    Remove from List
-                  </button>
-                )}
+            {orders.length === 0 ? (
+              <div className="rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-10 text-center">
+                <p className="text-5xl">🍕</p>
+                <p className="mt-4 text-xl font-extrabold uppercase">
+                  No orders yet
+                </p>
+                <p className="mt-2 text-sm text-gray-500">
+                  New orders will appear here when customers place them.
+                </p>
               </div>
-            ))}
+            ) : (
+              orders.map((order) => (
+                <div
+                  key={order._id}
+                  className="rounded-3xl border-2 border-[#F5E6CC] bg-[#FFF9ED] p-5"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-lg font-extrabold">
+                        #{order._id.slice(-6)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {order.user?.name} · {order.user?.email}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {order.items.map((i) => i.name).join(", ")}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-extrabold text-[#F7941D]">
+                        ₹{order.totalAmount}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Payment: {order.paymentStatus}
+                      </p>
+                      <p className="text-sm font-bold">
+                        Status:{" "}
+                        <span
+                          className={
+                            order.status === "Cancelled"
+                              ? "text-red-600"
+                              : "text-gray-700"
+                          }
+                        >
+                          {order.status}
+                        </span>
+                      </p>
+                      {order.status === "Cancelled" && order.cancelledBy && (
+                        <p className="mt-1 text-sm font-bold text-red-600">
+                          {order.cancelledBy === "user"
+                            ? "Cancelled by User"
+                            : "Cancelled by Admin"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {(order.phone || order.address?.details) && (
+                    <div className="mt-4 rounded-2xl bg-white p-4 text-sm">
+                      <p className="font-extrabold uppercase text-[#141414]">
+                        Delivery Address
+                      </p>
+                      {order.phone && (
+                        <p className="mt-1 text-gray-600">
+                          Phone: {order.phone}
+                        </p>
+                      )}
+                      {order.address?.details && (
+                        <p className="text-gray-600">
+                          {order.address.details}, {order.address.city},{" "}
+                          {order.address.state}, {order.address.country}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {order.status !== "Cancelled" && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {["Order Received", "In Kitchen", "Sent to Delivery"].map(
+                        (s) => (
+                          <button
+                            key={s}
+                            onClick={() => changeStatus(order._id, s)}
+                            className={`rounded-full px-4 py-1.5 text-xs font-bold ${
+                              order.status === s
+                                ? "bg-[#F7941D] text-white"
+                                : "border border-[#F5E6CC] bg-white text-gray-600"
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        ),
+                      )}
+
+                      {order.paymentStatus === "Pending" && (
+                        <button
+                          onClick={() => cancelOrder(order._id)}
+                          className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
+                        >
+                          Cancel Order
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {(order.status === "Cancelled" ||
+                    (order.paymentStatus === "Paid" &&
+                      order.status === "Sent to Delivery")) && (
+                    <button
+                      onClick={() => removeOrder(order._id)}
+                      className="mt-3 rounded-full border-2 border-gray-200 bg-white px-4 py-1.5 text-xs font-bold text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
+                    >
+                      Remove from List
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
